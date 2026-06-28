@@ -1,0 +1,18 @@
+{
+  "name": "unsafe live update",
+  "connector": "crm",
+  "action": "updateCustomer",
+  "mode": "write",
+  "scopes": ["crm.write"],
+  "approval": {
+    "required": false
+  },
+  "input": {
+    "customerId": "fixture-customer-001",
+    "email": "roger@example.com",
+    "token": "ghp_1234567890abcdefghijklmnop"
+  },
+  "expected": {
+    "status": "ok"
+  }
+}

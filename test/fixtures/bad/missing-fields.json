@@ -1,0 +1,8 @@
+{
+  "connector": "crm",
+  "action": "readCustomer",
+  "mode": "read-only",
+  "input": {
+    "customerId": "fixture-customer-001"
+  }
+}
