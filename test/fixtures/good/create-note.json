@@ -1,0 +1,19 @@
+{
+  "name": "create note dry run",
+  "connector": "crm",
+  "action": "createNote",
+  "mode": "dry-run",
+  "scopes": ["crm.write"],
+  "approval": {
+    "required": true,
+    "reason": "would write a note in live mode"
+  },
+  "input": {
+    "customerId": "fixture-customer-001",
+    "note": "Follow up after demo"
+  },
+  "expected": {
+    "status": "planned",
+    "writes": []
+  }
+}
