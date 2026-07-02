@@ -37,6 +37,7 @@ JSON output is intended for scripts. Markdown output is intended for PR bodies a
 
 ```bash
 npm test
+npm run lint
 npm run check
 npm run build
 npm run smoke
