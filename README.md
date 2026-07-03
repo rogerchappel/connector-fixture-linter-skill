@@ -39,6 +39,7 @@ JSON output is intended for scripts. Markdown output is intended for PR bodies a
 npm test
 npm run lint
 npm run check
+npm run lint
 npm run build
 npm run smoke
 npm run package:smoke
