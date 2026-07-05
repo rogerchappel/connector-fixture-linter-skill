@@ -20,6 +20,11 @@ test('write-like fixtures require approval', () => {
   assert.ok(report.results[0].issues.some((issue) => issue.code === 'approval_required'));
 });
 
+test('write fixtures declare expected writes for dry-run comparison', () => {
+  const report = lintPath('test/fixtures/bad/unsafe-write.json');
+  assert.ok(report.results[0].issues.some((issue) => issue.code === 'expected_writes'));
+});
+
 test('sensitive inputs are warnings', () => {
   const report = lintPath('test/fixtures/bad/unsafe-write.json');
   assert.ok(report.summary.warnings >= 2);
