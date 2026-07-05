@@ -17,6 +17,7 @@ export function lintFixture(file, fixture) {
     issues.push(error('invalid_scopes', 'scopes must be a non-empty array', '$.scopes'));
   }
   issues.push(...approvalIssues(fixture));
+  issues.push(...expectedWriteIssues(fixture));
   issues.push(...findSensitiveValues(fixture.input || fixture).map((finding) => warning(
     'sensitive_input',
     `fixture contains likely ${finding.code}`,
@@ -41,6 +42,14 @@ function approvalIssues(fixture) {
     issues.push(warning('approval_reason', 'approval metadata should include a reason', '$.approval.reason'));
   }
   return issues;
+}
+
+function expectedWriteIssues(fixture) {
+  if (fixture.mode !== 'write') return [];
+  if (!fixture.expected || !Array.isArray(fixture.expected.writes)) {
+    return [warning('expected_writes', 'write fixtures should declare expected.writes for dry-run comparison', '$.expected.writes')];
+  }
+  return [];
 }
 
 function error(code, message, path) {
