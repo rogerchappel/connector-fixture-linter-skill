@@ -9,6 +9,7 @@
   "files": [
     "bin",
     "src",
+    "scripts",
     "test/fixtures",
     "docs",
     "SKILL.md",

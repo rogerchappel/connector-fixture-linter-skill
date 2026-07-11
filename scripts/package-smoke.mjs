@@ -8,6 +8,7 @@ const files = new Set(pack.files.map((file) => file.path));
 
 const required = [
   "bin/connector-fixture-lint.js",
+  "scripts/package-smoke.mjs",
   "src/linter.js",
   "test/fixtures/good/create-note.json",
   "SKILL.md",
