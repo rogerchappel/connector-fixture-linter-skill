@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { lintPath } from '../src/linter.js';
 import { toMarkdownReport } from '../src/reporters.js';
 
@@ -34,4 +35,19 @@ test('sensitive inputs are warnings', () => {
 test('directory traversal includes nested fixture files', () => {
   const report = lintPath('test/fixtures');
   assert.equal(report.summary.fixtures, 4);
+});
+
+test('CLI smoke renders markdown for fixture directories', () => {
+  const output = execFileSync(process.execPath, [
+    'bin/connector-fixture-lint.js',
+    'test/fixtures/good',
+    '--format',
+    'markdown'
+  ], {
+    cwd: new URL('..', import.meta.url),
+    encoding: 'utf8'
+  });
+
+  assert.match(output, /# Connector Fixture Lint Report/);
+  assert.match(output, /Errors: 0/);
 });
