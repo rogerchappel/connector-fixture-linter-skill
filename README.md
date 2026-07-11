@@ -37,7 +37,6 @@ JSON output is intended for scripts. Markdown output is intended for PR bodies a
 
 ```bash
 npm test
-npm run lint
 npm run check
 npm run lint
 npm run build
@@ -47,7 +46,8 @@ npm run release:check
 ```
 
 `npm run release:check` is the broadest local gate. It runs syntax checks, tests, the build check, fixture-backed smoke, and package contents validation.
-## Development checks
+
+## CI checks
 
 Run the same local gates that CI runs before opening a PR:
 
@@ -58,3 +58,10 @@ npm test --if-present
 npm run smoke --if-present
 ```
 
+## Package contents
+
+The npm package is intentionally limited to the CLI, source, fixtures, docs, and release/support files. Check the publish preview with:
+
+```bash
+npm pack --dry-run
+```
