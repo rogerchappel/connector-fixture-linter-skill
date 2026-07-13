@@ -47,6 +47,10 @@ npm run release:check
 
 `npm run release:check` is the broadest local gate. It runs syntax checks, tests, the build check, fixture-backed smoke, and package contents validation.
 
+`npm run release:readiness` verifies public package metadata, the CLI bin target,
+supporting docs, fixture presence, npm files allowlist, and CI workflow before
+runtime checks execute.
+
 ## CI checks
 
 Run the same local gates that CI runs before opening a PR:
