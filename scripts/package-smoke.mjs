@@ -9,8 +9,11 @@ const files = new Set(pack.files.map((file) => file.path));
 const required = [
   "bin/connector-fixture-lint.js",
   "scripts/package-smoke.mjs",
+  "scripts/validate-release-readiness.mjs",
   "src/linter.js",
   "test/fixtures/good/create-note.json",
+  "docs/EXAMPLE_REPORT.md",
+  "docs/RELEASE_CANDIDATE.md",
   "SKILL.md",
   "README.md",
   "LICENSE",
