@@ -13,6 +13,11 @@ Recorded on 2026-06-28:
 - `npm run build` passed, 11 required files present
 - `npm run smoke` passed against `test/fixtures/good`, 2 fixtures and 0 errors
 
+Recorded on 2026-07-13:
+
+- `npm run release:check` passed the metadata readiness validator, syntax checks,
+  tests, build check, fixture-backed smoke, and npm package contents smoke.
+
 Recorded on 2026-07-05:
 
 - Added an `expected_writes` warning for live write-mode fixtures that do not declare `expected.writes`.
