@@ -9,6 +9,19 @@ npm install
 node bin/connector-fixture-lint.js test/fixtures/good --format markdown
 ```
 
+## Verification
+
+Run the same checks used for release-readiness before publishing or opening a release PR:
+
+```bash
+npm run check
+npm test
+npm run build
+npm run smoke
+npm run release:check
+npm pack --dry-run
+```
+
 ## CLI
 
 ```bash
