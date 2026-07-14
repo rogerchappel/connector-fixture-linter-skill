@@ -19,12 +19,21 @@ const required = [
   "LICENSE",
   "SECURITY.md",
   "CONTRIBUTING.md",
-  "CHANGELOG.md"
+  "CHANGELOG.md",
+  "CODE_OF_CONDUCT.md"
+];
+const forbidden = [
+  "test/cli-help.test.js",
+  "test/linter.test.js"
 ];
 
 const missing = required.filter((file) => !files.has(file));
-if (missing.length) {
+const unexpected = forbidden.filter((file) => files.has(file));
+if (missing.length || unexpected.length) {
   console.error(`Package smoke failed; missing files:\n${missing.join("\n")}`);
+  if (unexpected.length) {
+    console.error(`Package smoke failed; unexpectedly packed:\n${unexpected.join("\n")}`);
+  }
   process.exit(1);
 }
 

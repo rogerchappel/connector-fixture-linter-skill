@@ -5,9 +5,14 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   verify:
+    name: Release readiness
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,17 +31,5 @@ jobs:
             npm install
           fi
 
-      - name: Check package
-        run: npm run check --if-present
-
-      - name: Build package
-        run: npm run build --if-present
-
-      - name: Run tests
-        run: npm test --if-present
-
-      - name: Run smoke test
-        run: npm run smoke --if-present
-
-      - name: Check package contents
-        run: npm run package:smoke --if-present
+      - name: Run release checks
+        run: npm run release:check
