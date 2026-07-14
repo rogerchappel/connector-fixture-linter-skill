@@ -64,6 +64,9 @@ npm run release:check
 supporting docs, fixture presence, npm files allowlist, and CI workflow before
 runtime checks execute.
 
+`npm run package:smoke` also verifies that the release tarball includes the code
+of conduct and support files without bundling the test suite.
+
 ## CI checks
 
 Run the same local gates that CI runs before opening a PR:
