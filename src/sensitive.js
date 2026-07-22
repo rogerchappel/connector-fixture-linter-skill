@@ -1,5 +1,5 @@
 const PATTERNS = [
-  { code: 'secret_token', pattern: /\b(?:sk|ghp|gho|xoxb|xoxp)_[A-Za-z0-9_=-]{12,}\b/g },
+  { code: 'secret_token', pattern: /\b(?:sk-(?:proj-)?|(?:sk|ghp|gho|xoxb|xoxp)_)[A-Za-z0-9_=-]{12,}\b/g },
   { code: 'bearer_token', pattern: /\bBearer\s+[A-Za-z0-9._~+/=-]{16,}\b/g },
   { code: 'email', pattern: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi },
   { code: 'phone', pattern: /\b(?:\+?\d[\d .()-]{8,}\d)\b/g }
