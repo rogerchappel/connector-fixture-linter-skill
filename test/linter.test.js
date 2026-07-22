@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { lintPath } from '../src/linter.js';
 import { toMarkdownReport } from '../src/reporters.js';
+import { lintFixture } from '../src/rules.js';
 
 test('valid fixture directory passes without errors', () => {
   const report = lintPath('test/fixtures/good');
@@ -30,6 +31,29 @@ test('sensitive inputs are warnings', () => {
   const report = lintPath('test/fixtures/bad/unsafe-write.json');
   assert.ok(report.summary.warnings >= 2);
   assert.ok(report.results[0].issues.some((issue) => issue.code === 'sensitive_input'));
+});
+
+test('modern OpenAI API keys are detected and masked', () => {
+  for (const token of [
+    'sk-abcdefghijklmnopqrstuvwxyz123456',
+    'sk-proj-abcdefghijklmnopqrstuvwxyz123456'
+  ]) {
+    const result = lintFixture('openai.json', {
+      connector: 'openai',
+      action: 'list-models',
+      mode: 'read-only',
+      scopes: ['models.read'],
+      approval: { required: false },
+      input: { apiKey: token },
+      expected: {}
+    });
+    const finding = result.issues.find((issue) => issue.code === 'sensitive_input');
+
+    assert.ok(finding);
+    assert.equal(finding.path, '$.apiKey');
+    assert.notEqual(finding.sample, token);
+    assert.ok(!finding.sample.includes(token));
+  }
 });
 
 test('directory traversal includes nested fixture files', () => {
