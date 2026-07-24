@@ -30,6 +30,8 @@ connector-fixture-lint <file-or-directory> [--format json|markdown]
 
 The linter validates:
 
+- At least one `.json` fixture is discovered when the target is a directory
+- Each parsed fixture has a JSON object at its root
 - Required fields: `connector`, `action`, `mode`, `scopes`, `approval`, `input`, `expected`
 - Mode values: `dry-run`, `read-only`, or `write`
 - Approval metadata for write-like actions
@@ -38,6 +40,12 @@ The linter validates:
 ## Reports
 
 JSON output is intended for scripts. Markdown output is intended for PR bodies and release-candidate reviews.
+
+The CLI exits `0` only when it discovers at least one fixture and the report has
+no errors. It exits `1` for lint errors, invalid JSON, non-object fixture roots,
+empty fixture directories, and other read failures. Usage errors, such as a
+missing target, exit `2`. Non-object roots are represented in reports as an
+`invalid_fixture_root` error at JSON path `$`.
 
 ## Safety Notes
 

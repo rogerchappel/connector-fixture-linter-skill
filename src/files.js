@@ -4,6 +4,9 @@ import { join } from 'node:path';
 export function readFixtureFiles(target) {
   const stats = statSync(target);
   const files = stats.isDirectory() ? collectJson(target) : [target];
+  if (files.length === 0) {
+    throw new Error(`no JSON fixture files found in ${target}`);
+  }
   return files.map((file) => ({
     file,
     data: JSON.parse(readFileSync(file, 'utf8'))
