@@ -17,6 +17,21 @@ test('missing fields are reported as errors', () => {
   assert.match(toMarkdownReport(report), /missing_field/);
 });
 
+test('non-object fixture roots are reported as structured errors', () => {
+  for (const fixture of [null, false, 42, 'fixture', []]) {
+    const result = lintFixture('invalid-root.json', fixture);
+
+    assert.equal(result.file, 'invalid-root.json');
+    assert.equal(result.fixtureName, 'invalid fixture');
+    assert.deepEqual(result.issues, [{
+      severity: 'error',
+      code: 'invalid_fixture_root',
+      message: 'fixture root must be a JSON object',
+      path: '$'
+    }]);
+  }
+});
+
 test('write-like fixtures require approval', () => {
   const report = lintPath('test/fixtures/bad/unsafe-write.json');
   assert.ok(report.results[0].issues.some((issue) => issue.code === 'approval_required'));
