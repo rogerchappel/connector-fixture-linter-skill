@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { lintPath } from '../src/linter.js';
 import { toMarkdownReport } from '../src/reporters.js';
 import { lintFixture } from '../src/rules.js';
@@ -74,6 +77,33 @@ test('modern OpenAI API keys are detected and masked', () => {
 test('directory traversal includes nested fixture files', () => {
   const report = lintPath('test/fixtures');
   assert.equal(report.summary.fixtures, 4);
+});
+
+test('empty fixture directories fail library and CLI linting', (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'connector-fixture-lint-empty-'));
+  t.after(() => rmSync(directory, { recursive: true }));
+
+  assert.throws(
+    () => lintPath(directory),
+    { message: `no JSON fixture files found in ${directory}` }
+  );
+
+  const result = spawnSync(process.execPath, [
+    'bin/connector-fixture-lint.js',
+    directory,
+    '--format',
+    'json'
+  ], {
+    cwd: new URL('..', import.meta.url),
+    encoding: 'utf8'
+  });
+
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, '');
+  assert.equal(
+    result.stderr,
+    `connector-fixture-lint: no JSON fixture files found in ${directory}\n`
+  );
 });
 
 test('CLI smoke renders markdown for fixture directories', () => {
