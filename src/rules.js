@@ -4,6 +4,14 @@ const REQUIRED = ['connector', 'action', 'mode', 'scopes', 'approval', 'input', 
 const WRITE_ACTIONS = ['create', 'update', 'delete', 'send', 'post', 'publish', 'archive', 'invite'];
 
 export function lintFixture(file, fixture) {
+  if (!isFixtureObject(fixture)) {
+    return {
+      file,
+      fixtureName: 'invalid fixture',
+      issues: [error('invalid_fixture_root', 'fixture root must be a JSON object', '$')]
+    };
+  }
+
   const issues = [];
   for (const field of REQUIRED) {
     if (!(field in fixture)) {
@@ -25,6 +33,10 @@ export function lintFixture(file, fixture) {
     finding.sample
   )));
   return { file, fixtureName: fixture.name || `${fixture.connector || 'unknown'}:${fixture.action || 'unknown'}`, issues };
+}
+
+function isFixtureObject(fixture) {
+  return fixture !== null && typeof fixture === 'object' && !Array.isArray(fixture);
 }
 
 function approvalIssues(fixture) {

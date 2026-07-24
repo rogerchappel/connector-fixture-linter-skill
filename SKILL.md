@@ -4,7 +4,7 @@ Use this skill before relying on connector or action fixtures as release evidenc
 
 ## Required Inputs
 
-- A local connector fixture JSON file or a directory containing fixture JSON files
+- A local connector fixture JSON file or a directory containing at least one `.json` fixture
 
 ## Tools
 
@@ -40,3 +40,7 @@ npm run check
 npm run build
 npm run smoke
 ```
+
+Treat any non-zero CLI exit as failed validation. Empty fixture directories do
+not provide release evidence, and fixture files must contain a JSON object at
+their root.
