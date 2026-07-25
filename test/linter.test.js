@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { lintPath } from '../src/linter.js';
@@ -32,6 +32,101 @@ test('non-object fixture roots are reported as structured errors', () => {
       message: 'fixture root must be a JSON object',
       path: '$'
     }]);
+  }
+});
+
+test('malformed field shapes are reported with field-specific paths', () => {
+  const result = lintFixture('malformed.json', {
+    connector: {},
+    action: [],
+    mode: 42,
+    scopes: ['customers.read', ''],
+    approval: [],
+    input: 'not-an-object',
+    expected: null
+  });
+
+  assert.equal(result.fixtureName, 'unknown:unknown');
+  assert.deepEqual(
+    result.issues.filter((issue) => issue.severity === 'error'),
+    [
+      ['invalid_connector', '$.connector'],
+      ['invalid_action', '$.action'],
+      ['invalid_mode', '$.mode'],
+      ['invalid_scope', '$.scopes[1]'],
+      ['invalid_approval', '$.approval'],
+      ['invalid_input', '$.input'],
+      ['invalid_expected', '$.expected']
+    ].map(([code, path]) => ({
+      severity: 'error',
+      code,
+      message: result.issues.find((issue) => issue.code === code).message,
+      path
+    }))
+  );
+});
+
+test('all supported fields reject invalid present values', () => {
+  const cases = [
+    ['connector', '', 'invalid_connector', '$.connector'],
+    ['action', null, 'invalid_action', '$.action'],
+    ['mode', {}, 'invalid_mode', '$.mode'],
+    ['scopes', 'customers.read', 'invalid_scopes', '$.scopes'],
+    ['scopes', [], 'invalid_scopes', '$.scopes'],
+    ['scopes', [7], 'invalid_scope', '$.scopes[0]'],
+    ['approval', null, 'invalid_approval', '$.approval'],
+    ['input', [], 'invalid_input', '$.input'],
+    ['expected', 'result', 'invalid_expected', '$.expected']
+  ];
+
+  for (const [field, value, code, path] of cases) {
+    const fixture = {
+      connector: 'crm',
+      action: 'read-customer',
+      mode: 'read-only',
+      scopes: ['customers.read'],
+      approval: { required: false },
+      input: {},
+      expected: {}
+    };
+    fixture[field] = value;
+    const result = lintFixture(`${field}.json`, fixture);
+    assert.ok(
+      result.issues.some((issue) => issue.severity === 'error' && issue.code === code && issue.path === path),
+      `${field}=${JSON.stringify(value)} should produce ${code} at ${path}`
+    );
+  }
+});
+
+test('malformed field shapes make JSON and Markdown CLI reports exit 1', (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'connector-fixture-lint-shapes-'));
+  const fixturePath = join(directory, 'malformed.json');
+  t.after(() => rmSync(directory, { recursive: true }));
+  writeFileSync(fixturePath, JSON.stringify({
+    connector: {},
+    action: [],
+    mode: 'dry-run',
+    scopes: [''],
+    approval: [],
+    input: 'not-an-object',
+    expected: null
+  }));
+
+  for (const format of ['json', 'markdown']) {
+    const result = spawnSync(process.execPath, [
+      'bin/connector-fixture-lint.js',
+      fixturePath,
+      '--format',
+      format
+    ], {
+      cwd: new URL('..', import.meta.url),
+      encoding: 'utf8'
+    });
+
+    assert.equal(result.status, 1);
+    assert.doesNotMatch(result.stdout, /\[object Object\]/);
+    assert.match(result.stdout, /invalid_connector/);
+    assert.match(result.stdout, /invalid_scope/);
   }
 });
 
