@@ -43,4 +43,6 @@ npm run smoke
 
 Treat any non-zero CLI exit as failed validation. Empty fixture directories do
 not provide release evidence, and fixture files must contain a JSON object at
-their root.
+their root. Each fixture needs non-empty string `connector` and `action`
+identifiers, an allowed `mode`, a non-empty array of non-empty string `scopes`,
+and JSON objects for `approval`, `input`, and `expected`.

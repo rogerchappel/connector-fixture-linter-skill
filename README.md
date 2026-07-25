@@ -33,7 +33,10 @@ The linter validates:
 - At least one `.json` fixture is discovered when the target is a directory
 - Each parsed fixture has a JSON object at its root
 - Required fields: `connector`, `action`, `mode`, `scopes`, `approval`, `input`, `expected`
-- Mode values: `dry-run`, `read-only`, or `write`
+- Non-empty string values for `connector` and `action`
+- A `mode` value of `dry-run`, `read-only`, or `write`
+- A non-empty `scopes` array whose entries are non-empty strings
+- JSON objects for `approval`, `input`, and `expected` (arrays and `null` are not objects)
 - Approval metadata for write-like actions
 - Likely secrets and personal data inside fixture inputs
 
@@ -46,6 +49,11 @@ no errors. It exits `1` for lint errors, invalid JSON, non-object fixture roots,
 empty fixture directories, and other read failures. Usage errors, such as a
 missing target, exit `2`. Non-object roots are represented in reports as an
 `invalid_fixture_root` error at JSON path `$`.
+
+Malformed fields are errors at their exact JSON paths. For example, an empty
+second scope is reported as `invalid_scope` at `$.scopes[1]`. Report headings
+use only valid string identifiers, so malformed connector or action values are
+shown as `unknown` rather than being coerced into text.
 
 ## Safety Notes
 
