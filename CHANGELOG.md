@@ -4,6 +4,7 @@
 
 - Add release-readiness checks for package metadata, pack contents, and CI verification.
 - Reject empty fixture directories and report non-object JSON roots as structured lint errors.
+- Validate fixture field shapes and report malformed values at field-specific JSON paths.
 All notable changes to this project will be documented in this file.
 
 ## 0.1.0 - Initial release candidate
