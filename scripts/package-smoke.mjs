@@ -1,6 +1,10 @@
 import { execFileSync } from "node:child_process";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
-const output = execFileSync("npm", ["pack", "--dry-run", "--json"], {
+const packageDirectory = mkdtempSync(join(tmpdir(), "connector-fixture-package-smoke-"));
+const output = execFileSync("npm", ["pack", "--json", "--pack-destination", packageDirectory], {
   encoding: "utf8"
 });
 const [pack] = JSON.parse(output);
@@ -37,4 +41,20 @@ if (missing.length || unexpected.length) {
   process.exit(1);
 }
 
-console.log(`package smoke ok: ${pack.filename} includes ${pack.files.length} files`);
+try {
+  const installDirectory = join(packageDirectory, "install");
+  execFileSync("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund", "--prefix", installDirectory, join(packageDirectory, pack.filename)], {
+    stdio: "pipe"
+  });
+  const executable = join(installDirectory, "node_modules", ".bin", "connector-fixture-lint");
+  const report = execFileSync(executable, [resolve("test/fixtures/good"), "--format", "markdown"], {
+    encoding: "utf8"
+  });
+  if (!report.includes("# Connector Fixture Lint Report") || !report.includes("Errors: 0")) {
+    throw new Error("installed executable did not produce the expected clean Markdown report");
+  }
+} finally {
+  rmSync(packageDirectory, { recursive: true, force: true });
+}
+
+console.log(`package smoke ok: ${pack.filename} includes ${pack.files.length} files and its installed executable runs`);
