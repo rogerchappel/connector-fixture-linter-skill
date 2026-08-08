@@ -28,6 +28,11 @@ npm pack --dry-run
 connector-fixture-lint <file-or-directory> [--format json|markdown]
 ```
 
+The CLI accepts exactly one target and at most one `--format` option. The
+format option requires an explicit `json` or `markdown` value. `--help` and
+`-h` are valid only as standalone arguments; unknown options, duplicate format
+flags, and extra targets are rejected before the filesystem is accessed.
+
 The linter validates:
 
 - At least one `.json` fixture is discovered when the target is a directory
@@ -47,7 +52,8 @@ JSON output is intended for scripts. Markdown output is intended for PR bodies a
 The CLI exits `0` only when it discovers at least one fixture and the report has
 no errors. It exits `1` for lint errors, invalid JSON, non-object fixture roots,
 empty fixture directories, and other read failures. Usage errors, such as a
-missing target, exit `2`. Non-object roots are represented in reports as an
+missing target or malformed options, print the usage summary to stderr and exit
+`2`. Non-object roots are represented in reports as an
 `invalid_fixture_root` error at JSON path `$`.
 
 Malformed fields are errors at their exact JSON paths. For example, an empty
