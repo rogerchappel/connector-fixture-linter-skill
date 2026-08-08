@@ -8,23 +8,45 @@ function usage() {
 Validates local connector action fixtures. No connector calls are made.`;
 }
 
+class UsageError extends Error {}
+
 function parseArgs(argv) {
   const args = { target: null, format: 'json' };
+  let formatSeen = false;
+
+  if (argv.includes('--help') || argv.includes('-h')) {
+    if (argv.length !== 1) {
+      throw new UsageError('--help must be used by itself');
+    }
+    return { ...args, help: true };
+  }
+
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
-    if (value === '--help' || value === '-h') {
-      args.help = true;
-    } else if (value === '--format') {
-      args.format = argv[index + 1] || 'json';
+    if (value === '--format') {
+      if (formatSeen) {
+        throw new UsageError('--format may only be specified once');
+      }
+      const format = argv[index + 1];
+      if (!format || format.startsWith('-')) {
+        throw new UsageError('Missing value for --format');
+      }
+      args.format = format;
+      formatSeen = true;
       index += 1;
+    } else if (value.startsWith('-')) {
+      throw new UsageError(`Unknown option: ${value}`);
     } else if (!args.target) {
       args.target = value;
     } else {
-      throw new Error(`Unexpected argument: ${value}`);
+      throw new UsageError(`Unexpected argument: ${value}`);
     }
   }
   if (!['json', 'markdown'].includes(args.format)) {
-    throw new Error('--format must be json or markdown');
+    throw new UsageError('--format must be json or markdown');
+  }
+  if (!args.target) {
+    throw new UsageError('Missing file-or-directory target');
   }
   return args;
 }
@@ -35,14 +57,14 @@ try {
     console.log(usage());
     process.exit(0);
   }
-  if (!args.target) {
-    console.error(usage());
-    process.exit(2);
-  }
   const report = lintPath(args.target);
   console.log(args.format === 'markdown' ? toMarkdownReport(report) : toJsonReport(report));
   process.exit(report.summary.errors > 0 ? 1 : 0);
 } catch (error) {
   console.error(`connector-fixture-lint: ${error.message}`);
+  if (error instanceof UsageError) {
+    console.error(`\n${usage()}`);
+    process.exit(2);
+  }
   process.exit(1);
 }
