@@ -30,6 +30,12 @@ Any fixture that represents a write-like action must include explicit approval m
 npx connector-fixture-linter-skill test/fixtures/good --format markdown
 ```
 
+Supply exactly one fixture target and no more than one `--format json` or
+`--format markdown` option. A format value is required. Use `--help` or `-h`
+only by itself. Invalid options, duplicate format flags, extra targets, and
+non-standalone help print usage to stderr and exit `2` without reading fixture
+paths. Valid lint runs exit `0` when clean or `1` for lint and read failures.
+
 ## Validation
 
 Run:
