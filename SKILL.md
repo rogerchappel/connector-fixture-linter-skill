@@ -24,6 +24,16 @@ Use this skill before relying on connector or action fixtures as release evidenc
 
 Any fixture that represents a write-like action must include explicit approval metadata. A human must approve any later live connector action separately; this linter only validates fixture readiness.
 
+Set `approval.required` to `true` and provide a non-blank string
+`approval.reason` for write-like actions. If any fixture supplies a reason, it
+must have that same shape. For write mode, use an `expected.writes` array whose
+entries are non-blank scalar shorthands or objects containing non-blank string
+`operation` and `target` fields:
+
+```json
+{"approval":{"required":true,"reason":"approved in CRM-42"},"expected":{"writes":[{"operation":"create","target":"crm.note"}]}}
+```
+
 ## Example
 
 ```bash

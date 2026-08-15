@@ -43,7 +43,18 @@ The linter validates:
 - A non-empty `scopes` array whose entries are non-empty strings
 - JSON objects for `approval`, `input`, and `expected` (arrays and `null` are not objects)
 - Approval metadata for write-like actions
+- Structured write approval and rehearsal evidence
 - Likely secrets and personal data inside fixture inputs
+
+Write-like actions require `approval.required: true` and a non-blank string
+`approval.reason`. When `approval.reason` is supplied on any fixture, it must
+be a non-blank string. Write-mode fixtures should declare an
+`expected.writes` array. Each entry is either a non-blank scalar shorthand or
+an object with non-blank string `operation` and `target` fields:
+
+```json
+{"approval":{"required":true,"reason":"approved in CRM-42"},"expected":{"writes":[{"operation":"create","target":"crm.note"},"audit event CRM-42"]}}
+```
 
 ## Reports
 
