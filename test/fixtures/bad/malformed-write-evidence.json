@@ -1,0 +1,10 @@
+{
+  "name": "malformed write evidence",
+  "connector": "crm",
+  "action": "createNote",
+  "mode": "write",
+  "scopes": ["crm.write"],
+  "approval": { "required": true, "reason": { "ticket": 42 } },
+  "input": { "customerId": "fixture-customer-001" },
+  "expected": { "writes": [null, { "unexpected": true }, "   "] }
+}

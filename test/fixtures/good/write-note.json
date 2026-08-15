@@ -1,0 +1,22 @@
+{
+  "name": "valid note write evidence",
+  "connector": "crm",
+  "action": "createNote",
+  "mode": "write",
+  "scopes": ["crm.write"],
+  "approval": {
+    "required": true,
+    "reason": "approved in change request CRM-42"
+  },
+  "input": {
+    "customerId": "fixture-customer-001",
+    "note": "Follow up after demo"
+  },
+  "expected": {
+    "status": "ok",
+    "writes": [
+      { "operation": "create", "target": "crm.note" },
+      "audit event CRM-42"
+    ]
+  }
+}
