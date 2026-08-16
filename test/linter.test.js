@@ -10,7 +10,7 @@ import { lintFixture } from '../src/rules.js';
 
 test('valid fixture directory passes without errors', () => {
   const report = lintPath('test/fixtures/good');
-  assert.equal(report.summary.fixtures, 2);
+  assert.equal(report.summary.fixtures, 3);
   assert.equal(report.summary.errors, 0);
 });
 
@@ -140,6 +140,17 @@ test('write fixtures declare expected writes for dry-run comparison', () => {
   assert.ok(report.results[0].issues.some((issue) => issue.code === 'expected_writes'));
 });
 
+test('malformed nested write evidence has path-specific errors', () => {
+  const report = lintPath('test/fixtures/bad/malformed-write-evidence.json');
+  const errors = report.results[0].issues.filter((issue) => issue.severity === 'error');
+  assert.deepEqual(errors.map((issue) => issue.path), [
+    '$.approval.reason',
+    '$.expected.writes[0]',
+    '$.expected.writes[1]',
+    '$.expected.writes[2]'
+  ]);
+});
+
 test('sensitive inputs are warnings', () => {
   const report = lintPath('test/fixtures/bad/unsafe-write.json');
   assert.ok(report.summary.warnings >= 2);
@@ -171,7 +182,7 @@ test('modern OpenAI API keys are detected and masked', () => {
 
 test('directory traversal includes nested fixture files', () => {
   const report = lintPath('test/fixtures');
-  assert.equal(report.summary.fixtures, 4);
+  assert.equal(report.summary.fixtures, 6);
 });
 
 test('empty fixture directories fail library and CLI linting', (t) => {
