@@ -20,6 +20,32 @@ test('missing fields are reported as errors', () => {
   assert.match(toMarkdownReport(report), /missing_field/);
 });
 
+test('Markdown reports render fixture-controlled values as literal text', () => {
+  const output = toMarkdownReport({
+    target: 'fixtures\n# injected [target](https://example.com)',
+    summary: { fixtures: 1, errors: 1, warnings: 0 },
+    results: [{
+      fixtureName: 'fixture\n## heading - list `code`',
+      file: 'fixtures/[link](destination).json',
+      issues: [{
+        severity: 'error',
+        code: 'bad`code',
+        path: '$.input\n- item',
+        message: 'message\n# heading [link](destination) `code`',
+        sample: 'sample *emphasis* `tick`'
+      }]
+    }]
+  });
+
+  assert.match(output, /Target: fixtures # injected \\[target\\]\\\(https:\/\/example\\\.com\\\)/);
+  assert.match(output, /## fixture ## heading \\- list \\`code\\`/);
+  assert.match(output, /File: fixtures\/\\\[link\\\]\\\(destination\\\)\\\.json/);
+  assert.match(output, /bad\\`code at \$\\\.input \\- item/);
+  assert.match(output, /message # heading \\[link\\]\\\(destination\\\) \\`code\\`/);
+  assert.match(output, /sample \\\*emphasis\\\* \\`tick\\`/);
+  assert.doesNotMatch(output, /\n# injected|\n## heading|\n- item/);
+});
+
 test('non-object fixture roots are reported as structured errors', () => {
   for (const fixture of [null, false, 42, 'fixture', []]) {
     const result = lintFixture('invalid-root.json', fixture);
