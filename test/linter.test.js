@@ -17,7 +17,33 @@ test('valid fixture directory passes without errors', () => {
 test('missing fields are reported as errors', () => {
   const report = lintPath('test/fixtures/bad/missing-fields.json');
   assert.ok(report.summary.errors >= 3);
-  assert.match(toMarkdownReport(report), /missing_field/);
+  assert.match(toMarkdownReport(report), /missing\\_field/);
+});
+
+test('Markdown reports render fixture-controlled values as literal text', () => {
+  const output = toMarkdownReport({
+    target: 'fixtures\n# injected [target](https://example.com)',
+    summary: { fixtures: 1, errors: 1, warnings: 0 },
+    results: [{
+      fixtureName: 'fixture\n## heading - list `code`',
+      file: 'fixtures/[link](destination).json',
+      issues: [{
+        severity: 'error',
+        code: 'bad`code',
+        path: '$.input\n- item',
+        message: 'message\n# heading [link](destination) `code`',
+        sample: 'sample *emphasis* `tick`'
+      }]
+    }]
+  });
+
+  assert.ok(output.includes('Target: fixtures \\# injected \\[target\\]\\(https://example\\.com\\)'));
+  assert.ok(output.includes('## fixture \\#\\# heading \\- list \\`code\\`'));
+  assert.ok(output.includes('File: fixtures/\\[link\\]\\(destination\\)\\.json'));
+  assert.ok(output.includes('bad\\`code at $\\.input \\- item'));
+  assert.ok(output.includes('message \\# heading \\[link\\]\\(destination\\) \\`code\\`'));
+  assert.ok(output.includes('sample \\*emphasis\\* \\`tick\\`'));
+  assert.doesNotMatch(output, /\n# injected|\n## heading|\n- item/);
 });
 
 test('non-object fixture roots are reported as structured errors', () => {
@@ -125,8 +151,10 @@ test('malformed field shapes make JSON and Markdown CLI reports exit 1', (t) => 
 
     assert.equal(result.status, 1);
     assert.doesNotMatch(result.stdout, /\[object Object\]/);
-    assert.match(result.stdout, /invalid_connector/);
-    assert.match(result.stdout, /invalid_scope/);
+    const connectorCode = format === 'markdown' ? /invalid\\_connector/ : /invalid_connector/;
+    const scopeCode = format === 'markdown' ? /invalid\\_scope/ : /invalid_scope/;
+    assert.match(result.stdout, connectorCode);
+    assert.match(result.stdout, scopeCode);
   }
 });
 

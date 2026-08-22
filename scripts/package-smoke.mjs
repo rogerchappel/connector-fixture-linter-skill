@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -52,6 +52,23 @@ try {
   });
   if (!report.includes("# Connector Fixture Lint Report") || !report.includes("Errors: 0")) {
     throw new Error("installed executable did not produce the expected clean Markdown report");
+  }
+  const literalFixture = join(packageDirectory, "literal-markdown.json");
+  writeFileSync(literalFixture, JSON.stringify({
+    name: "fixture\n## injected - item `code`",
+    connector: "crm",
+    action: "read",
+    mode: "read-only",
+    scopes: ["records.read"],
+    approval: { required: false },
+    input: {},
+    expected: {}
+  }));
+  const literalReport = execFileSync(executable, [literalFixture, "--format", "markdown"], {
+    encoding: "utf8"
+  });
+  if (!literalReport.includes("## fixture \\#\\# injected \\- item \\`code\\`") || literalReport.includes("\n## injected")) {
+    throw new Error("installed executable did not render fixture names as literal Markdown text");
   }
 } finally {
   rmSync(packageDirectory, { recursive: true, force: true });

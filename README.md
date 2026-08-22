@@ -59,6 +59,11 @@ an object with non-blank string `operation` and `target` fields:
 ## Reports
 
 JSON output is intended for scripts. Markdown output is intended for PR bodies and release-candidate reviews.
+In Markdown reports, target paths, fixture names, file paths, and diagnostic
+fields are treated as literal text: line breaks and surrounding whitespace are
+normalized, and Markdown punctuation is backslash-escaped. This prevents
+fixture-controlled headings, lists, links, emphasis, or code spans while
+preserving the displayed text. JSON output retains the original values.
 
 The CLI exits `0` only when it discovers at least one fixture and the report has
 no errors. It exits `1` for lint errors, invalid JSON, non-object fixture roots,
