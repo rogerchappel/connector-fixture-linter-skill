@@ -37,12 +37,12 @@ test('Markdown reports render fixture-controlled values as literal text', () => 
     }]
   });
 
-  assert.match(output, /Target: fixtures # injected \\[target\\]\\\(https:\/\/example\\\.com\\\)/);
-  assert.match(output, /## fixture ## heading \\- list \\`code\\`/);
-  assert.match(output, /File: fixtures\/\\\[link\\\]\\\(destination\\\)\\\.json/);
-  assert.match(output, /bad\\`code at \$\\\.input \\- item/);
-  assert.match(output, /message # heading \\[link\\]\\\(destination\\\) \\`code\\`/);
-  assert.match(output, /sample \\\*emphasis\\\* \\`tick\\`/);
+  assert.ok(output.includes('Target: fixtures \\# injected \\[target\\]\\(https://example\\.com\\)'));
+  assert.ok(output.includes('## fixture \\#\\# heading \\- list \\`code\\`'));
+  assert.ok(output.includes('File: fixtures/\\[link\\]\\(destination\\)\\.json'));
+  assert.ok(output.includes('bad\\`code at $\\.input \\- item'));
+  assert.ok(output.includes('message \\# heading \\[link\\]\\(destination\\) \\`code\\`'));
+  assert.ok(output.includes('sample \\*emphasis\\* \\`tick\\`'));
   assert.doesNotMatch(output, /\n# injected|\n## heading|\n- item/);
 });
 
