@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Render fixture- and diagnostic-controlled Markdown report values as normalized, escaped literal text.
 - Add release-readiness checks for package metadata, pack contents, and CI verification.
 - Reject empty fixture directories and report non-object JSON roots as structured lint errors.
 - Validate fixture field shapes and report malformed values at field-specific JSON paths.
