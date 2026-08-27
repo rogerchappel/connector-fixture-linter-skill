@@ -48,6 +48,6 @@
   },
   "homepage": "https://github.com/rogerchappel/connector-fixture-linter-skill#readme",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   }
 }
