@@ -3,7 +3,8 @@
 ## [Unreleased]
 
 - Pin CI checkout and setup-node actions to immutable commit SHAs.
-- Verify the fixture linter on Node.js 18, 20, and 22 with explicit check, test, smoke, and build gates before the release-readiness check.
+- Raise the supported runtime to Node.js 22 or newer, verify Node.js 22 and 24,
+  and require lockfile-based `npm ci` installs in CI and release readiness.
 - Render fixture- and diagnostic-controlled Markdown report values as normalized, escaped literal text.
 - Add release-readiness checks for package metadata, pack contents, and CI verification.
 - Reject empty fixture directories and report non-object JSON roots as structured lint errors.

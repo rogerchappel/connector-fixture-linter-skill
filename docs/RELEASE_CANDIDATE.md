@@ -4,6 +4,11 @@
 
 Initial public build for `connector-fixture-linter-skill`.
 
+The candidate supports maintained Node.js 22 and 24 release lines. CI
+verification and the Node.js 24 release gate install from the committed
+lockfile with `npm ci`; release-readiness checks enforce the runtime, docs, and
+workflow contract against drift.
+
 ## Verification
 
 Recorded on 2026-06-28:

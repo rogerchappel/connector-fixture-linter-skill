@@ -8,7 +8,7 @@ Use this skill before relying on connector or action fixtures as release evidenc
 
 ## Tools
 
-- Local shell with Node.js 18 or newer
+- Local shell with Node.js 22 or newer
 - No connector credentials are required
 - No network access is required
 

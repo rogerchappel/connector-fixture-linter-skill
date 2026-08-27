@@ -2,10 +2,13 @@
 
 Local-first CLI and skill instructions for checking connector action fixtures before dry-run rehearsals or release-candidate evidence.
 
+Requires Node.js 22 or newer. CI verifies the supported Node.js 22 and 24
+release lines from the committed lockfile.
+
 ## Quickstart
 
 ```bash
-npm install
+npm ci
 node bin/connector-fixture-lint.js test/fixtures/good --format markdown
 ```
 
