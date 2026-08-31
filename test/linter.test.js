@@ -163,6 +163,34 @@ test('write-like fixtures require approval', () => {
   assert.ok(report.results[0].issues.some((issue) => issue.code === 'approval_required'));
 });
 
+test('write-action classification uses a leading verb boundary', () => {
+  const fixture = {
+    connector: 'forum',
+    mode: 'read-only',
+    scopes: ['history.read'],
+    approval: { required: false },
+    input: {},
+    expected: {}
+  };
+
+  for (const action of ['read_post_history', 'repost_summary', 'updated_record']) {
+    const result = lintFixture(`${action}.json`, { ...fixture, action });
+    assert.equal(
+      result.issues.some((issue) => issue.code === 'approval_required'),
+      false,
+      `${action} must remain read-like`
+    );
+  }
+
+  for (const action of ['post_message', 'createNote', 'delete']) {
+    const result = lintFixture(`${action}.json`, { ...fixture, action });
+    assert.ok(
+      result.issues.some((issue) => issue.code === 'approval_required'),
+      `${action} must remain write-like`
+    );
+  }
+});
+
 test('write fixtures declare expected writes for dry-run comparison', () => {
   const report = lintPath('test/fixtures/bad/unsafe-write.json');
   assert.ok(report.results[0].issues.some((issue) => issue.code === 'expected_writes'));
@@ -177,6 +205,37 @@ test('malformed nested write evidence has path-specific errors', () => {
     '$.expected.writes[1]',
     '$.expected.writes[2]'
   ]);
+});
+
+test('expected writes accept only documented string and object shapes', () => {
+  const result = lintFixture('write-evidence.json', {
+    connector: 'crm',
+    action: 'createNote',
+    mode: 'write',
+    scopes: ['crm.write'],
+    approval: { required: true, reason: 'approved in CRM-42' },
+    input: {},
+    expected: {
+      writes: [
+        'audit event CRM-42',
+        { operation: 'create', target: 'crm.note' },
+        false,
+        0,
+        true,
+        null,
+        [],
+        '   ',
+        {},
+        { operation: '', target: 'crm.note' },
+        { operation: 'create', target: 42 }
+      ]
+    }
+  });
+
+  assert.deepEqual(
+    result.issues.filter((issue) => issue.code === 'invalid_expected_write').map((issue) => issue.path),
+    Array.from({ length: 9 }, (_, index) => `$.expected.writes[${index + 2}]`)
+  );
 });
 
 test('sensitive inputs are warnings', () => {
