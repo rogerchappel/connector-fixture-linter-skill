@@ -50,10 +50,16 @@ The linter validates:
 - Likely secrets and personal data inside fixture inputs
 
 Write-like actions require `approval.required: true` and a non-blank string
-`approval.reason`. When `approval.reason` is supplied on any fixture, it must
-be a non-blank string. Write-mode fixtures should declare an
-`expected.writes` array. Each entry is either a non-blank scalar shorthand or
-an object with non-blank string `operation` and `target` fields:
+`approval.reason`. An action is write-like when its mode is `write`, or when
+its first action word is `create`, `update`, `delete`, `send`, `post`,
+`publish`, `archive`, or `invite`. Camel-case transitions and non-alphanumeric
+separators delimit words, so `createNote` and `post_message` are write-like,
+while `read_post_history` and `repost_summary` are not. When
+`approval.reason` is supplied on any fixture, it must be a non-blank string.
+Write-mode fixtures should declare an `expected.writes` array. Each entry must
+be either a non-blank string shorthand or a JSON object with non-blank string
+`operation` and `target` fields. Numbers, booleans, `null`, arrays, blank
+strings, and objects missing either required field are invalid:
 
 ```json
 {"approval":{"required":true,"reason":"approved in CRM-42"},"expected":{"writes":[{"operation":"create","target":"crm.note"},"audit event CRM-42"]}}
