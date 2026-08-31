@@ -1,7 +1,7 @@
 import { findSensitiveValues } from './sensitive.js';
 
 const REQUIRED = ['connector', 'action', 'mode', 'scopes', 'approval', 'input', 'expected'];
-const WRITE_ACTIONS = ['create', 'update', 'delete', 'send', 'post', 'publish', 'archive', 'invite'];
+const WRITE_ACTIONS = new Set(['create', 'update', 'delete', 'send', 'post', 'publish', 'archive', 'invite']);
 
 export function lintFixture(file, fixture) {
   if (!isFixtureObject(fixture)) {
@@ -70,8 +70,7 @@ function fixtureDisplayName(fixture) {
 
 function approvalIssues(fixture) {
   const issues = [];
-  const actionName = isNonEmptyString(fixture.action) ? fixture.action.toLowerCase() : '';
-  const looksWrite = fixture.mode === 'write' || WRITE_ACTIONS.some((word) => actionName.includes(word));
+  const looksWrite = fixture.mode === 'write' || isWriteAction(fixture.action);
   if (!isFixtureObject(fixture.approval)) {
     if (!looksWrite || 'approval' in fixture) return issues;
     return [error('missing_approval', 'write-like actions require approval metadata', '$.approval')];
@@ -90,6 +89,14 @@ function approvalIssues(fixture) {
   return issues;
 }
 
+function isWriteAction(action) {
+  if (!isNonEmptyString(action)) return false;
+  const words = action.trim()
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .split(/[^A-Za-z0-9]+/);
+  return WRITE_ACTIONS.has(words[0].toLowerCase());
+}
+
 function expectedWriteIssues(fixture) {
   if (fixture.mode !== 'write') return [];
   if (!isFixtureObject(fixture.expected)) return [];
@@ -98,21 +105,14 @@ function expectedWriteIssues(fixture) {
   }
   return fixture.expected.writes.flatMap((entry, index) => {
     const path = `$.expected.writes[${index}]`;
-    if (entry === null) {
-      return [error('invalid_expected_write', 'expected write entries cannot be null', path)];
-    }
-    if (typeof entry === 'object') {
-      if (Array.isArray(entry)) {
-        return [error('invalid_expected_write', 'expected write entries cannot be arrays', path)];
-      }
+    if (isFixtureObject(entry)) {
       return isNonEmptyString(entry.operation) && isNonEmptyString(entry.target)
         ? []
         : [error('invalid_expected_write', 'object entries require non-blank operation and target strings', path)];
     }
-    if (typeof entry === 'string' && entry.trim() === '') {
-      return [error('invalid_expected_write', 'scalar entries must not be blank', path)];
-    }
-    return [];
+    return isNonEmptyString(entry)
+      ? []
+      : [error('invalid_expected_write', 'entries must be non-blank strings or objects with non-blank operation and target strings', path)];
   });
 }
 
