@@ -103,6 +103,9 @@ function expectedWriteIssues(fixture) {
   if (!Array.isArray(fixture.expected.writes)) {
     return [warning('expected_writes', 'write fixtures should declare expected.writes for dry-run comparison', '$.expected.writes')];
   }
+  if (fixture.expected.writes.length === 0) {
+    return [error('empty_expected_writes', 'write fixtures require at least one expected write', '$.expected.writes')];
+  }
   return fixture.expected.writes.flatMap((entry, index) => {
     const path = `$.expected.writes[${index}]`;
     if (isFixtureObject(entry)) {
