@@ -1,0 +1,17 @@
+{
+  "name": "empty write evidence",
+  "connector": "crm",
+  "action": "createNote",
+  "mode": "write",
+  "scopes": ["crm.write"],
+  "approval": {
+    "required": true,
+    "reason": "approved in change request CRM-42"
+  },
+  "input": {
+    "customerId": "fixture-customer-001"
+  },
+  "expected": {
+    "writes": []
+  }
+}
