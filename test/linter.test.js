@@ -196,6 +196,36 @@ test('write fixtures declare expected writes for dry-run comparison', () => {
   assert.ok(report.results[0].issues.some((issue) => issue.code === 'expected_writes'));
 });
 
+test('write fixtures require at least one expected write', () => {
+  const report = lintPath('test/fixtures/bad/empty-write-evidence.json');
+
+  assert.equal(report.summary.errors, 1);
+  assert.deepEqual(report.results[0].issues, [{
+    severity: 'error',
+    code: 'empty_expected_writes',
+    message: 'write fixtures require at least one expected write',
+    path: '$.expected.writes'
+  }]);
+});
+
+test('empty expected writes make the CLI exit 1 with a field-specific report', () => {
+  const result = spawnSync(process.execPath, [
+    'bin/connector-fixture-lint.js',
+    'test/fixtures/bad/empty-write-evidence.json',
+    '--format',
+    'json'
+  ], {
+    cwd: new URL('..', import.meta.url),
+    encoding: 'utf8'
+  });
+
+  assert.equal(result.status, 1);
+  assert.equal(result.stderr, '');
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.summary.errors, 1);
+  assert.equal(report.results[0].issues[0].path, '$.expected.writes');
+});
+
 test('malformed nested write evidence has path-specific errors', () => {
   const report = lintPath('test/fixtures/bad/malformed-write-evidence.json');
   const errors = report.results[0].issues.filter((issue) => issue.severity === 'error');
@@ -269,7 +299,7 @@ test('modern OpenAI API keys are detected and masked', () => {
 
 test('directory traversal includes nested fixture files', () => {
   const report = lintPath('test/fixtures');
-  assert.equal(report.summary.fixtures, 6);
+  assert.equal(report.summary.fixtures, 7);
 });
 
 test('empty fixture directories fail library and CLI linting', (t) => {
