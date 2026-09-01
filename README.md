@@ -56,7 +56,9 @@ its first action word is `create`, `update`, `delete`, `send`, `post`,
 separators delimit words, so `createNote` and `post_message` are write-like,
 while `read_post_history` and `repost_summary` are not. When
 `approval.reason` is supplied on any fixture, it must be a non-blank string.
-Write-mode fixtures should declare an `expected.writes` array. Each entry must
+Write-mode fixtures should declare a non-empty `expected.writes` array. A
+present but empty array is an error because it supplies no rehearsal evidence.
+Each entry must
 be either a non-blank string shorthand or a JSON object with non-blank string
 `operation` and `target` fields. Numbers, booleans, `null`, arrays, blank
 strings, and objects missing either required field are invalid:

@@ -26,8 +26,9 @@ Any fixture that represents a write-like action must include explicit approval m
 
 Set `approval.required` to `true` and provide a non-blank string
 `approval.reason` for write-like actions. If any fixture supplies a reason, it
-must have that same shape. For write mode, use an `expected.writes` array whose
-entries are non-blank strings or JSON objects containing non-blank string
+must have that same shape. For write mode, use a non-empty `expected.writes`
+array. An empty array is an error because it cannot substantiate the fixture's
+expected side effects. Entries are non-blank strings or JSON objects containing non-blank string
 `operation` and `target` fields. Booleans, numbers, `null`, arrays, blank
 strings, and malformed objects are invalid write evidence:
 
