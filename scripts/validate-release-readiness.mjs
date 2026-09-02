@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { isReleaseVersion } from "./release-version.mjs";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const readme = readFileSync("README.md", "utf8");
@@ -11,7 +12,7 @@ function requireField(condition, message) {
 }
 
 requireField(pkg.name === "connector-fixture-linter-skill", "package name must remain connector-fixture-linter-skill");
-requireField(pkg.version === "0.1.0", "release candidate version must stay explicit");
+requireField(isReleaseVersion(pkg.version), "package version must be valid SemVer");
 requireField(pkg.license === "MIT", "package must declare the MIT license");
 requireField(pkg.repository?.url === "git+https://github.com/rogerchappel/connector-fixture-linter-skill.git", "repository metadata must point at GitHub");
 requireField(pkg.bugs?.url === "https://github.com/rogerchappel/connector-fixture-linter-skill/issues", "bugs URL must point at GitHub issues");
