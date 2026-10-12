@@ -17,3 +17,7 @@ All notable changes to this project will be documented in this file.
 - Provides a local-first connector fixture linter CLI and skill.
 - Checks fixture structure, approval metadata, allowed modes, and likely sensitive values.
 - Includes fixture-backed tests, smoke checks, CI, and package contents validation.
+
+## Unreleased
+
+- Configure weekly Dependabot updates for GitHub Actions dependencies.
