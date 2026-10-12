@@ -134,3 +134,10 @@ The npm package is intentionally limited to the CLI, source, fixtures, docs, and
 ```bash
 npm pack --dry-run
 ```
+
+### Automated GitHub Actions updates
+
+Dependabot checks this repository's GitHub Actions dependencies weekly and can
+propose updates as pull requests. Review each proposed action revision and keep
+actions pinned to immutable commit SHAs, updating the accompanying version
+comments where applicable.
