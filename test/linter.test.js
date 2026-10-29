@@ -182,11 +182,35 @@ test('write-action classification uses a leading verb boundary', () => {
     );
   }
 
-  for (const action of ['post_message', 'createNote', 'delete']) {
+  for (const action of [
+    'post_message', 'createNote', 'delete',
+    'create✨note', 'delete—record', 'send/notification',
+    `create_${'q'.repeat(5000)}`
+  ]) {
     const result = lintFixture(`${action}.json`, { ...fixture, action });
     assert.ok(
       result.issues.some((issue) => issue.code === 'approval_required'),
       `${action} must remain write-like`
+    );
+  }
+});
+
+test('unusual separators and long suffixes do not make read-only verbs look write-like', () => {
+  const fixture = {
+    connector: 'forum',
+    mode: 'read-only',
+    scopes: ['history.read'],
+    approval: { required: false },
+    input: {},
+    expected: {}
+  };
+
+  for (const action of ['read✨post_history', 'read—post-history', 'read/post_history', `${'read'.repeat(5000)}_history`]) {
+    const result = lintFixture(`${action}.json`, { ...fixture, action });
+    assert.equal(
+      result.issues.some((issue) => issue.code === 'approval_required'),
+      false,
+      `${action} must remain read-like`
     );
   }
 });
